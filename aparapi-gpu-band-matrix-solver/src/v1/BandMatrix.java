@@ -106,6 +106,6 @@ final public class BandMatrix {
 
       }
       return x;
-   }  
+   }
 
 }

@@ -41,25 +41,27 @@ import tests.Parameter;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BandMatrixTest {
 
-   public static final BandMatrix A = new BandMatrix(Parameter.ROW_NUMBER, Parameter.BAND_WIDTH);
+   public static BandMatrix A;
 
-   public static final Vector B = new Vector(Parameter.ROW_NUMBER);
+   public static Vector B;
 
-   private static boolean INIT_NEEDED = true;
+   public static boolean initNeeded = true;
 
    private static final Object HANDLER_INIT_LOCK = new Object();
 
    @BeforeClass
    public static void v2_setup() {
       synchronized (HANDLER_INIT_LOCK) {
-         if (INIT_NEEDED) {
+         if (initNeeded) {
+            A = new BandMatrix(Parameter.ROW_NUMBER, Parameter.BAND_WIDTH);
+            B = new Vector(Parameter.ROW_NUMBER);
             for (int row = 0; row < Parameter.ROW_NUMBER; row++) {
                for (int col = 0; col <= (Parameter.BAND_WIDTH >> 1); col++) {
                   A.setValue(row, row + col, createRandomNumber());
                }
                B.setValue(row, createRandomNumber());
             }
-            INIT_NEEDED = false;
+            initNeeded = false;
          }
       }
    }

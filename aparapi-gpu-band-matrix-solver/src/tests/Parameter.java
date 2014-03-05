@@ -31,12 +31,12 @@
 
 package tests;
 
-public interface Parameter {
+public class Parameter {
 
-   int NUMBER_OF_POCESSORS = Runtime.getRuntime().availableProcessors();
+   public static int NUMBER_OF_POCESSORS = Runtime.getRuntime().availableProcessors();
 
-   int BAND_WIDTH = 32 + 1;
+   public static int BAND_WIDTH = 8 + 1;
 
-   int ROW_NUMBER = 256;
+   public static int ROW_NUMBER = 32;
 
 }

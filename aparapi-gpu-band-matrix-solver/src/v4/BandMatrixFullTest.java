@@ -41,13 +41,15 @@ import tests.Parameter;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BandMatrixFullTest {
 
-   private static final BandMatrixFull A = new BandMatrixFull(Parameter.ROW_NUMBER, Parameter.BAND_WIDTH);
+   private static BandMatrixFull A;
 
-   private static final Vector B = new Vector(Parameter.ROW_NUMBER);
+   private static Vector B;
 
    @BeforeClass
    public static void v4_setup() {
       v2.BandMatrixTest.v2_setup();
+      A = new BandMatrixFull(Parameter.ROW_NUMBER, Parameter.BAND_WIDTH);
+      B = new Vector(Parameter.ROW_NUMBER);
       for (int row = 0; row < Parameter.ROW_NUMBER; row++) {
          for (int col = row; col < row + Parameter.BAND_WIDTH && col < Parameter.ROW_NUMBER; col++) {
             A.setValue(row, col, v2.BandMatrixTest.A.getValue(row, col));

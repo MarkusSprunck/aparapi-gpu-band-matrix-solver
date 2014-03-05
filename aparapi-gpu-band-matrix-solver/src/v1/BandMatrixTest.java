@@ -41,13 +41,15 @@ import tests.Parameter;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BandMatrixTest {
 
-   static final v1.BandMatrix A = new v1.BandMatrix(Parameter.ROW_NUMBER, Parameter.BAND_WIDTH);
+   static v1.BandMatrix A;
 
-   static final v1.Matrix B = new v1.Matrix(Parameter.ROW_NUMBER, 1);
+   static v1.Matrix B;
 
    @BeforeClass
    public static void v1_setup() {
       v2.BandMatrixTest.v2_setup();
+      A = new v1.BandMatrix(Parameter.ROW_NUMBER, Parameter.BAND_WIDTH);
+      B = new v1.Matrix(Parameter.ROW_NUMBER, 1);
       for (int row = 0; row < Parameter.ROW_NUMBER; row++) {
          for (int col = row; col < row + Parameter.BAND_WIDTH && col < Parameter.ROW_NUMBER; col++) {
             A.setValue(row, col, v2.BandMatrixTest.A.getValue(row, col));
