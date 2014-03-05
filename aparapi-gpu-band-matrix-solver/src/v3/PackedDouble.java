@@ -33,16 +33,17 @@ package v3;
 
 /**
  * This class calculates simple floating point operations up to 16 digits
- * without using double values. Floating points are represented by a long 
- * value with packed mantissa and exponent. The motivation is that for GPU
- * computations quite often FP64 is not available and some algorithms just 
- * need a better precision than float. 
+ * without using type double. Floating points are represented by a long 
+ * value with packed mantissa and exponent. 
+ * 
+ * The motivation is that for GPU computations quite often FP64 is not 
+ * available and some algorithms just need a better precision than float. 
  * 
  */
 public class PackedDouble {
 
    /**
-    * Two digits are reserved for exponent [0..99] 
+    * First two digits are reserved for exponent [0..99] 
     */
    private final static int MIN_EXP = -49;
 
@@ -99,17 +100,21 @@ public class PackedDouble {
     * 
     */
    public static long pack(double value) {
-      int exponent = (int) (((Double.doubleToRawLongBits(value) << 1 >>> 33) - 1072632447L) / 3483293L);
-      exponent = (exponent < MIN_EXP) ? MIN_EXP : exponent;
+      if (value == 0.0) {
+         return 0L;
+      }
+
+      final int exponent = (int) (((Double.doubleToRawLongBits(value) << 1 >>> 33) - 1072632447L) / 3483293L);
       final long mantissa = (long) (value * POW_10_DOUBLE[POW_OFFSET + DIGITS - exponent - 1]);
-      return (exponent - MIN_EXP) * SPLIT_EXP * (mantissa >> 63 | -mantissa >>> 63) + mantissa;
+      final long mantissa_sign = mantissa >> 63 | -mantissa >>> 63;
+      return (exponent - MIN_EXP) * SPLIT_EXP * mantissa_sign + mantissa;
    }
 
    public static double unpack(long value) {
       final long exponent_fraction = value / SPLIT_EXP;
       final long unpacked_mantissa = value - exponent_fraction * SPLIT_EXP;
-      final long unpacked_exponent = exponent_fraction * (exponent_fraction >> 63 | -exponent_fraction >>> 63)
-            + MIN_EXP;
+      final long exponent_fraction_sign = exponent_fraction >> 63 | -exponent_fraction >>> 63;
+      final long unpacked_exponent = exponent_fraction * exponent_fraction_sign + MIN_EXP;
       return unpacked_mantissa * POW_10_DOUBLE[(int) (POW_OFFSET + unpacked_exponent - DIGITS + 1)];
    }
 
@@ -124,11 +129,13 @@ public class PackedDouble {
       final long mr_lo = mr_mantissa % SPLIT_INT;
 
       final long product_mantissa = md_hi * mr_hi + md_lo * mr_hi / SPLIT_INT + md_hi * mr_lo / SPLIT_INT;
-      final long product_exponent = (multiplicand >> 63 | -multiplicand >>> 63) * (multiplicand / SPLIT_EXP)
-            + (multiplier >> 63 | -multiplier >>> 63) * (multiplier / SPLIT_EXP) + 2 * MIN_EXP + 1;
+      final long multiplicand_sign = multiplicand >> 63 | -multiplicand >>> 63;
+      final long multiplier_sign = multiplier >> 63 | -multiplier >>> 63;
+      final long product_exponent = multiplicand_sign * (multiplicand / SPLIT_EXP) + multiplier_sign
+            * (multiplier / SPLIT_EXP) + 2 * MIN_EXP + 1;
 
-      return (product_exponent - MIN_EXP) * SPLIT_EXP * (product_mantissa >> 63 | -product_mantissa >>> 63)
-            + product_mantissa;
+      final long product_mantissa_sign = product_mantissa >> 63 | -product_mantissa >>> 63;
+      return (product_exponent - MIN_EXP) * SPLIT_EXP * product_mantissa_sign + product_mantissa;
    }
 
    public static long addPacked(long augend, long addend) {
