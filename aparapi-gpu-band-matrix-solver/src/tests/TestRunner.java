@@ -57,7 +57,7 @@ public class TestRunner {
          System.out.println("");
          System.out.println("**************************************************************************");
 
-         Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH - 1) << 1) + 1;
+  //       Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH - 1) << 1) + 1;
          Parameter.ROW_NUMBER = Parameter.ROW_NUMBER << 1;
          v2.BandMatrixTest.initNeeded = true;
 

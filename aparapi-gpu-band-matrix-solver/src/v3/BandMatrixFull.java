@@ -262,6 +262,11 @@ final public class BandMatrixFull {
                + "ms/itteration, " + (end - start) + "ms, itterations=" + i + ", execution mode="
                + kernel.getExecutionMode().toString() + "]");
       }
+      
+      if (Kernel.EXECUTION_MODE.GPU.equals(mode)) {
+         Parameter.gpu_mode_succeded = kernel.getExecutionMode().equals(Kernel.EXECUTION_MODE.GPU);
+      }
+      
       return x;
    }
 
