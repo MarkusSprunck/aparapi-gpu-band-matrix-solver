@@ -47,7 +47,7 @@ public class TestRunner {
          System.out.println("");
          final Result result = JUnitCore.runClasses(v1.BandMatrixTest.class, v2.BandMatrixTest.class,
                v3.BandMatrixFullTest.class, v4.BandMatrixFullTest.class, v1.MatrixTest.class, v2.VectorTest.class,
-               v3.VectorTest.class, v4.VectorTest.class);
+               v4.VectorTest.class, v3.VectorTest.class);
 
          if (!result.getFailures().isEmpty()) {
             for (final Failure failure : result.getFailures()) {
@@ -57,7 +57,7 @@ public class TestRunner {
          System.out.println("");
          System.out.println("**************************************************************************");
 
-  //       Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH - 1) << 1) + 1;
+         //       Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH - 1) << 1) + 1;
          Parameter.ROW_NUMBER = Parameter.ROW_NUMBER << 1;
          v2.BandMatrixTest.initNeeded = true;
 

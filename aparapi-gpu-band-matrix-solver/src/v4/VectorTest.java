@@ -50,7 +50,7 @@ public class VectorTest {
       final double result = A.dotProduct(B);
 
       // ASSERT
-      Assert.assertEquals(22.0, result, 1.0E-3);
+      Assert.assertEquals(22.0, result, 0.0);
    }
 
    @Test
@@ -61,16 +61,16 @@ public class VectorTest {
       A.setValue(0, 7);
       A.setValue(1, 1);
       final Vector B = new Vector(2);
-      B.setValue(0, 0.14f);
-      B.setValue(1, 0.32f);
+      B.setValue(0, 0.14);
+      B.setValue(1, 0.32);
 
       // ACT
       final Vector result = new Vector(2);
       A.plus(B, result);
 
       // ASSERT
-      Assert.assertEquals(7.14, result.getValue(0), 1.0E-3);
-      Assert.assertEquals(1.32, result.getValue(1), 1.0E-3);
+      Assert.assertEquals(7.14, result.getValue(0), 1.0E-12);
+      Assert.assertEquals(1.32, result.getValue(1), 1.0E-12);
    }
 
    @Test
@@ -81,16 +81,16 @@ public class VectorTest {
       A.setValue(0, 7);
       A.setValue(1, 1);
       final Vector B = new Vector(2);
-      B.setValue(0, 0.14f);
-      B.setValue(1, 0.32f);
+      B.setValue(0, 0.14);
+      B.setValue(1, 0.32);
 
       // ACT
       final Vector result = new Vector(2);
       A.minus(B, result);
 
       // ASSERT
-      Assert.assertEquals(6.86, result.getValue(0), 1.0E-3);
-      Assert.assertEquals(0.68, result.getValue(1), 1.0E-3);
+      Assert.assertEquals(6.86, result.getValue(0), 1.0E-15);
+      Assert.assertEquals(0.68, result.getValue(1), 1.0E-15);
    }
 
    @Test
@@ -103,11 +103,11 @@ public class VectorTest {
 
       // ACT
       final Vector result = new Vector(2);
-      A.multi(0.11f, result);
+      A.multi(0.11, result);
 
       // ASSERT
-      Assert.assertEquals(0.77, result.getValue(0), 1.0E-3);
-      Assert.assertEquals(0.11, result.getValue(1), 1.0E-3);
+      Assert.assertEquals(0.77, result.getValue(0), 1.0E-15);
+      Assert.assertEquals(0.11, result.getValue(1), 1.0E-15);
    }
 
    @Test
@@ -133,6 +133,25 @@ public class VectorTest {
       for (int row = 0; row < A.getMaxRows(); row++) {
          A.setValue(row, (2 * row + 1) * (3 * 1 + 1));
       }
+
+      // ASSERT
+      for (int row = 0; row < A.getMaxRows(); row++) {
+         final double result = A.getValue(row);
+         Assert.assertEquals((2 * row + 1) * (3 * 1 + 1), result, 0);
+      }
+   }
+
+   @Test
+   public void v4_copyConstructor_AllValuesOfMatrix_CorrectResult() {
+
+      // ARRANGE
+      final Vector B = new Vector(10);
+      for (int row = 0; row < B.getMaxRows(); row++) {
+         B.setValue(row, (2 * row + 1) * (3 * 1 + 1));
+      }
+
+      // ACT
+      final Vector A = new Vector(B);
 
       // ASSERT
       for (int row = 0; row < A.getMaxRows(); row++) {

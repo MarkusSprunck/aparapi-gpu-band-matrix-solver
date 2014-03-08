@@ -28,33 +28,52 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package v3;
 
-import com.amd.aparapi.Kernel;
+package v4;
 
 /**
- * This class performs a band matrix multiplication (A x B = X)
- *
+ * This class calculates simple floating point operations up to 16 digits
+ * without using type double. Floating points are represented by a long 
+ * value with packed mantissa and exponent. 
+ * 
+ * The motivation is that for GPU computations quite often FP64 is not 
+ * available and some algorithms just need a better precision than float. 
+ * 
  */
-public class BandMatrixMultiplicatonAparapi extends Kernel {
+public class PackedDouble {
 
-   long[] vectorB = null;
+   /**
+    * First two digits are reserved for exponent [0..99] 
+    */
+   private final static int MIN_EXP = -49;
 
-   long[] matrixA = null;
+   /**
+    * Number of used digits in mantissa
+    */
+   private final static byte DIGITS = 16;
 
-   long[] vectorX = null;
+   /**
+    * Used to split the double value to mantissa and exponent. 
+    * The mantissa scaled to use maximal 17 digits. These are 
+    * MANTISSA_DIGITS plus 1 for overflows in add operation
+    */
+   final static long SPLIT_EXP = 100000000000000000L;
 
-   int[] bandwidthMid = new int[1];
+   /**
+    * Used to split the mantissa to a higher and lower integer. 
+    */
+   private final static long SPLIT_INT = 100000000L;
 
-   int[] colMaximum = new int[1];
+   private final static int POW_OFFSET = 500;
+   private static final double[] POW_10_DOUBLE = new double[POW_OFFSET << 1];
+   static {
+      for (int i = 0; i < POW_OFFSET << 1; i++) {
+         POW_10_DOUBLE[i] = Math.pow(10, i - POW_OFFSET);
+      }
+   }
 
-   int[] rowMaximum = new int[1];
-
-   long[] POW_10_LONG = new long[100];
-
-   public BandMatrixMultiplicatonAparapi() {
-      setExplicit(true);
-
+   private static final long[] POW_10_LONG = new long[POW_OFFSET];
+   static {
       POW_10_LONG[0] = 1;
       for (int i = 1; i < 100; i++) {
          if (i < 19) {
@@ -63,80 +82,43 @@ public class BandMatrixMultiplicatonAparapi extends Kernel {
             POW_10_LONG[i] = POW_10_LONG[18];
          }
       }
-      this.put(POW_10_LONG);
    }
 
-   @Override
-   public void run() {
-
-      // prepare input parameter
-      final int row = getGlobalId();
-
-      // execute band matrix multiplication (for one row)
-      long sum = -MIN_EXP * SPLIT_EXP;
-      int index = 0;
-      final int rowOffset = row * colMaximum[0];
-      for (int col = 0; col < colMaximum[0]; col++) {
-         index = row - bandwidthMid[0] + col;
-         if (index < rowMaximum[0] && index >= 0) {
-            sum = addPacked(sum, multiplyPacked(matrixA[col + rowOffset], vectorB[index]));
-         }
+   /**
+    * Approximation of log is good enough to determine the exponent.
+    * Source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c
+    * 
+    * public static double fastlog(double x) {
+    *    final double y = (Double.doubleToLongBits(x) >> 32);
+    *    return (y - 1072632447) / 1512775;
+    * }
+    *
+    * public static double fastabs(double x) {
+    *    final long y = Double.doubleToLongBits(x);
+    *    return Double.longBitsToDouble((y << 1) >>> 1);
+    * }
+    * 
+    */
+   public static long pack(double value) {
+      if (value == 0.0) {
+         return 0L;
       }
-      vectorX[row] = sum;
+
+      final int exponent = (int) (((Double.doubleToRawLongBits(value) << 1 >>> 33) - 1072632447L) / 3483293L);
+      final long mantissa = (long) (value * POW_10_DOUBLE[POW_OFFSET + DIGITS - exponent - 1]);
+      final long mantissa_sign = mantissa >> 63 | -mantissa >>> 63;
+      return (exponent - MIN_EXP) * SPLIT_EXP * mantissa_sign + mantissa;
    }
 
-   public void setMatrixA(long[] values, final int rowNumber, final int bandwidth) {
-      if (null == matrixA) {
-         matrixA = values;
-      }
-      vectorB = new long[rowNumber];
-      vectorX = new long[rowNumber];
-
-      bandwidthMid[0] = bandwidth >> 1;
-      colMaximum[0] = bandwidth;
-      rowMaximum[0] = rowNumber;
+   public static double unpack(long value) {
+      final long exponent_fraction = value / SPLIT_EXP;
+      final long unpacked_mantissa = value - exponent_fraction * SPLIT_EXP;
+      final long exponent_fraction_sign = exponent_fraction >> 63 | -exponent_fraction >>> 63;
+      final long unpacked_exponent = exponent_fraction * exponent_fraction_sign + MIN_EXP;
+      return unpacked_mantissa * POW_10_DOUBLE[(int) (POW_OFFSET + unpacked_exponent - DIGITS + 1)];
    }
 
-   public void setVectorB(long[] values) {
-      vectorB = values;
-      this.put(vectorB);
-   }
-
-   public void putVectorB() {
-      this.put(vectorB);
-   }
-
-   public void setVectorX(long[] values) {
-      vectorX = values;
-      this.put(vectorX);
-   }
-
-   public void getVectorX() {
-      this.get(vectorX);
-   }
-
-   //////////////////////////////////////////////////////////////
-   // Copied from PackedDecimalUtil | start
-   //////////////////////////////////////////////////////////////
-
-   /**
-    * Two digits are reserved for exponent [0..99] 
-    */
-   private static final int MIN_EXP = -49;
-
-   /**
-    * Used to split the double value to mantissa and exponent. 
-    * The mantissa scaled to use maximal 17 digits. These are 
-    * MANTISSA_DIGITS plus 1 for overflows in add operation
-    */
-   private static final long SPLIT_EXP = 100000000000000000L;
-
-   /**
-    * Used to split the mantissa to a higher and lower integer. 
-    */
-   private static final long SPLIT_INT = 100000000L;
-
-   public long multiplyPacked(long multiplicand, long multiplier) {
+   public static long multiplyPacked(long multiplicand, long multiplier) {
 
       final long md_mantissa = multiplicand - multiplicand / SPLIT_EXP * SPLIT_EXP;
       final long md_hi = md_mantissa / SPLIT_INT;
@@ -147,14 +129,16 @@ public class BandMatrixMultiplicatonAparapi extends Kernel {
       final long mr_lo = mr_mantissa % SPLIT_INT;
 
       final long product_mantissa = md_hi * mr_hi + md_lo * mr_hi / SPLIT_INT + md_hi * mr_lo / SPLIT_INT;
-      final long product_exponent = (multiplicand >> 63 | -multiplicand >>> 63) * (multiplicand / SPLIT_EXP)
-            + (multiplier >> 63 | -multiplier >>> 63) * (multiplier / SPLIT_EXP) + 2 * MIN_EXP + 1;
+      final long multiplicand_sign = multiplicand >> 63 | -multiplicand >>> 63;
+      final long multiplier_sign = multiplier >> 63 | -multiplier >>> 63;
+      final long product_exponent = multiplicand_sign * (multiplicand / SPLIT_EXP) + multiplier_sign
+            * (multiplier / SPLIT_EXP) + 2 * MIN_EXP + 1;
 
-      return (product_exponent - MIN_EXP) * SPLIT_EXP * (product_mantissa >> 63 | -product_mantissa >>> 63)
-            + product_mantissa;
+      final long product_mantissa_sign = product_mantissa >> 63 | -product_mantissa >>> 63;
+      return (product_exponent - MIN_EXP) * SPLIT_EXP * product_mantissa_sign + product_mantissa;
    }
 
-   public long addPacked(long augend, long addend) {
+   public static long addPacked(long augend, long addend) {
 
       long augend_exponent = ((augend >> 63 | -augend >>> 63) * (augend / SPLIT_EXP) + MIN_EXP);
       long addend_exponent = ((addend >> 63 | -addend >>> 63) * (addend / SPLIT_EXP) + MIN_EXP);

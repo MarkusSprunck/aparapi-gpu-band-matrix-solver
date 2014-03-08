@@ -30,11 +30,9 @@
  */
 package v3;
 
-import tests.Parameter;
+import java.util.concurrent.ForkJoinPool;
 
-import com.amd.aparapi.Kernel;
-import com.amd.aparapi.Kernel.EXECUTION_MODE;
-import com.amd.aparapi.Range;
+import tests.Parameter;
 
 /* The symmetric banded matrix ( '-' indicates zero values):
  * 
@@ -57,9 +55,10 @@ import com.amd.aparapi.Range;
  * [ -, -, a0, a1, a2,   -, a1, a3, a4, a5,    a2, a4, a6, a7, a8,   a5, a7, a9, a10, -,  a8, a10,  a11, -, - ] 
  * 
  */
-final public class BandMatrixFull {
+public final class BandMatrixFull {
 
-   private static final String NL = System.getProperty("line.separator");
+   // create thread pool
+   public static final ForkJoinPool POOL = new ForkJoinPool(Parameter.NUMBER_OF_POCESSORS << 1);
 
    private static final int MAX_NUMBER_OF_ITTERATIONS = 100000;
 
@@ -67,15 +66,15 @@ final public class BandMatrixFull {
 
    private final int cols;
 
-   final long[] packedValues;
+   protected final double[] values;
 
    public BandMatrixFull(final int rowsNumber, final int bandwidth) {
       rows = rowsNumber;
       cols = bandwidth;
-      packedValues = new long[rows * cols];
+      values = new double[rows * cols];
    }
 
-   public Vector times(final Vector b, Vector result) {
+   public void times(final Vector b, final Vector result) {
 
       // prepare input parameter
       final int rowStart = 0;
@@ -85,20 +84,20 @@ final public class BandMatrixFull {
       final int bandwidthMid = colMaximum >> 1;
 
       // execute band matrix multiplication
+      int index = 0;
+      int rowOffset = 0;
+      double sum = 0.0;
       for (int row = rowStart; row < rowEnd; row++) {
-         final int rowOffset = row * colMaximum;
-         long sum = PackedDouble.pack(0.0);
+         rowOffset = row * colMaximum;
+         sum = 0.0;
          for (int col = 0; col < colMaximum; col++) {
-            final int index = row - bandwidthMid + col;
+            index = row - bandwidthMid + col;
             if (index < rowMaximum && index >= 0) {
-               final long second = b.packedValues[index];
-               final long temp = PackedDouble.multiplyPacked(packedValues[col + rowOffset], second);
-               sum = PackedDouble.addPacked(sum, temp);
+               sum += values[col + rowOffset] * b.values[index];
             }
          }
-         result.packedValues[row] = sum;
+         result.values[row] = sum;
       }
-      return result;
    }
 
    private int getIndex(final int row, final int col) {
@@ -123,23 +122,23 @@ final public class BandMatrixFull {
     */
    public void setValue(final int row, final int col, final double value) {
       final int indexUpperBand = getIndex(row, (cols >> 1) + col - row);
-      if (indexUpperBand >= 0 && indexUpperBand < packedValues.length) {
-         packedValues[indexUpperBand] = PackedDouble.pack(value);
+      if (indexUpperBand >= 0 && indexUpperBand < values.length) {
+         values[indexUpperBand] = value;
       }
       if (row < col) {
          final int indexLowerBand = getIndex(col, (cols >> 1) - (col - row));
-         if (indexLowerBand >= 0 && indexLowerBand < packedValues.length) {
-            packedValues[indexLowerBand] = PackedDouble.pack(value);
+         if (indexLowerBand >= 0 && indexLowerBand < values.length) {
+            values[indexLowerBand] = value;
          }
       }
    }
 
-   public static Vector solveConjugateGradientStandard(BandMatrixFull A, Vector b, boolean loggingEnabled) {
+   public static Vector solveConjugateGradient(final BandMatrixFull A, final Vector b, boolean loggingEnabled) {
       // Measure start time for logging
       final long start = System.currentTimeMillis();
 
       // create local variables
-      int i = 0;
+      int i = -1;
       double rsnew = 1.0;
       final int numberOfEquations = b.getMaxRows();
       final Vector Ap = new Vector(numberOfEquations);
@@ -186,16 +185,18 @@ final public class BandMatrixFull {
       if (loggingEnabled) {
          final long end = System.currentTimeMillis();
          System.out.println("v3.BandMatrix Standard CG ready [" + String.format("%.5f", (float) (end - start) / i)
-               + "ms/itteration, " + (end - start) + "ms, itterations=" + i + "]");
+               + "ms/itteration, " + +(end - start) + "ms, itterations=" + i + "]");
       }
       return x;
    }
 
-   public static Vector solveConjugateGradientAparapi(BandMatrixFull A, Vector b, boolean loggingEnabled,
-         EXECUTION_MODE mode) {
+   public static Vector solveConjugateGradientForkAndJoin(BandMatrixFull A, Vector b, boolean loggingEnabled) {
+
+      // Measure start time for logging
+      final long start = System.currentTimeMillis();
 
       // create local variables
-      int i = 0;
+      int i = -1;
       double rsnew = 1.0;
       final int numberOfEquations = b.getMaxRows();
       final Vector Ap = new Vector(numberOfEquations);
@@ -213,26 +214,10 @@ final public class BandMatrixFull {
       // rsold = r' * r
       double rsold = r.dotProduct(r);
 
-      // Create kernel and initialize the attributes 
-      final v3.BandMatrixMultiplicatonAparapi kernel = new v3.BandMatrixMultiplicatonAparapi();
-      kernel.setMatrixA(A.packedValues, A.getMaxRows(), A.getMaxCols());
-      kernel.setVectorX(Ap.packedValues);
-      kernel.setVectorB(p.packedValues);
-      Range range = Range.create(A.getMaxRows());
-      if (Kernel.EXECUTION_MODE.JTP.equals(mode)) {
-         range = Range.create(A.getMaxRows(), Parameter.NUMBER_OF_POCESSORS << 1);
-      }
-      kernel.setExecutionMode(mode);
-      kernel.execute(range);
-
-      // Measure start time for logging (don't respect the setup time for Aparapi)
-      final long start = System.currentTimeMillis();
-
       while (i++ < MAX_NUMBER_OF_ITTERATIONS && rsnew > 1e-10) {
          // Ap = A * p
-         kernel.putVectorB();
-         kernel.execute(range);
-         kernel.getVectorX();
+         final v3.BandMatrixMultiplicatonTask task = new v3.BandMatrixMultiplicatonTask(0, A.getMaxRows(), A, p, Ap);
+         POOL.invoke(task);
 
          // alpha = rsold / ( p' * Ap )
          final double alpha = rsold / p.dotProduct(Ap);
@@ -258,15 +243,10 @@ final public class BandMatrixFull {
 
       if (loggingEnabled) {
          final long end = System.currentTimeMillis();
-         System.out.println("v3.BandMatrix Aparapi  CG ready [" + String.format("%.5f", (float) (end - start) / i)
-               + "ms/itteration, " + (end - start) + "ms, itterations=" + i + ", execution mode="
-               + kernel.getExecutionMode().toString() + "]");
+         System.out.println("v3.BandMatrix ForkJoin CG ready [" + String.format("%.5f", (float) (end - start) / i)
+               + "ms/itteration, " + (end - start) + "ms, itterations=" + i + "]");
+
       }
-      
-      if (Kernel.EXECUTION_MODE.GPU.equals(mode)) {
-         Parameter.gpu_mode_succeded = kernel.getExecutionMode().equals(Kernel.EXECUTION_MODE.GPU);
-      }
-      
       return x;
    }
 
@@ -278,18 +258,4 @@ final public class BandMatrixFull {
       return cols;
    }
 
-   @Override
-   public String toString() {
-      final StringBuilder sb = new StringBuilder("v1.Matrix[");
-      sb.append(NL);
-      for (int row = 0; row < rows; row++) {
-         sb.append('[');
-         for (int col = 0; col < cols; col++) {
-            sb.append(String.format("%.6E  ", PackedDouble.unpack(packedValues[getIndex(row, col)])));
-         }
-         sb.append(']').append(sb.append(NL));
-      }
-      sb.append(']');
-      return sb.toString();
-   }
 }

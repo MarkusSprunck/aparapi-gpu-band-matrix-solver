@@ -32,74 +32,75 @@ package v3;
 
 public class Vector {
 
-   protected final long[] packedValues;
+   protected final double[] values;
 
    public Vector(final int length) {
-      packedValues = new long[length];
+      values = new double[length];
    }
 
    public Vector(final Vector A) {
-      this(A.packedValues);
+      this(A.values);
    }
 
-   public Vector(final long[] values) {
-      packedValues = new long[values.length];
-      System.arraycopy(values, 0, packedValues, 0, values.length);
+   public Vector(final double[] values) {
+      this.values = new double[values.length];
+      System.arraycopy(values, 0, this.values, 0, values.length);
    }
 
    // return C = A + B
-   public Vector plus(final Vector B, final Vector result) {
-      for (int i = 0; i < packedValues.length; i++) {
-         result.packedValues[i] = PackedDouble.addPacked(packedValues[i], B.packedValues[i]);
+   public void plus(final Vector B, final Vector result) {
+      for (int i = 0; i < values.length; i++) {
+         result.values[i] = values[i] + B.values[i];
       }
-      return result;
    }
 
    // return C = A - B
-   public Vector minus(final Vector B, final Vector result) {
-      for (int i = 0; i < packedValues.length; i++) {
-         result.packedValues[i] = PackedDouble.pack(PackedDouble.unpack(packedValues[i])
-               - PackedDouble.unpack(B.packedValues[i]));
+   public void minus(final Vector B, final Vector result) {
+      for (int i = 0; i < values.length; i++) {
+         result.values[i] = values[i] - B.values[i];
       }
-      return result;
    }
 
    // return C = A o B 
    public double dotProduct(final Vector B) {
-      double result = 0.0;
-      for (int i = 0; i < packedValues.length; i++) {
-         result += PackedDouble.unpack(PackedDouble.multiplyPacked(packedValues[i], B.packedValues[i]));
+      double C = 0.0f;
+      for (int i = 0; i < values.length; i++) {
+         C += values[i] * B.values[i];
       }
-      return result;
+      return C;
    }
 
    // return C = A * alpha
-   public Vector multi(final double alpha, final Vector result) {
-      for (int i = 0; i < packedValues.length; i++) {
-         result.packedValues[i] = PackedDouble.pack(PackedDouble.unpack(packedValues[i]) * alpha);
+   public void multi(final double alpha, final Vector result) {
+      for (int i = 0; i < values.length; i++) {
+         result.values[i] = values[i] * alpha;
       }
-      return result;
    }
 
    public void setValue(final int index, final double value) {
-      packedValues[index] = PackedDouble.pack(value);
+      values[index] = value;
    }
 
    public double getValue(final int index) {
-      return PackedDouble.unpack(packedValues[index]);
+      return values[index];
+   }
+
+   protected double[] getValues() {
+      return values;
    }
 
    public int getMaxRows() {
-      return packedValues.length;
+      return values.length;
    }
 
    @Override
    public String toString() {
-      final StringBuilder sb = new StringBuilder("v5.Vector [");
-      for (int i = 0; i < packedValues.length; i++) {
-         sb.append(String.format("%.6E", PackedDouble.unpack(packedValues[i]))).append("  ");
+      final StringBuilder sb = new StringBuilder("v3.Vector [");
+      for (int i = 0; i < values.length; i++) {
+         sb.append(String.format("%.6E", values[i])).append("  ");
       }
       sb.append(']');
       return sb.toString();
    }
+
 }
