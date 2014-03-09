@@ -184,8 +184,7 @@ public final class BandMatrixFull {
 
       if (loggingEnabled) {
          final long end = System.currentTimeMillis();
-         System.out.println("v3.BandMatrix Standard CG ready [" + String.format("%.5f", (float) (end - start) / i)
-               + "ms/itteration, " + +(end - start) + "ms, itterations=" + i + "]");
+         System.out.print("\t" + (end - start)  );         
       }
       return x;
    }
@@ -243,9 +242,7 @@ public final class BandMatrixFull {
 
       if (loggingEnabled) {
          final long end = System.currentTimeMillis();
-         System.out.println("v3.BandMatrix ForkJoin CG ready [" + String.format("%.5f", (float) (end - start) / i)
-               + "ms/itteration, " + (end - start) + "ms, itterations=" + i + "]");
-
+         System.out.print("\t" + (end - start)  );
       }
       return x;
    }

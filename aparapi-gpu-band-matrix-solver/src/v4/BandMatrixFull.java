@@ -185,8 +185,7 @@ final public class BandMatrixFull {
 
       if (loggingEnabled) {
          final long end = System.currentTimeMillis();
-         System.out.println("v4.BandMatrix Standard CG ready [" + String.format("%.5f", (float) (end - start) / i)
-               + "ms/itteration, " + (end - start) + "ms, itterations=" + i + "]");
+         System.out.print("\t" + (end - start));
       }
       return x;
    }
@@ -258,15 +257,13 @@ final public class BandMatrixFull {
 
       if (loggingEnabled) {
          final long end = System.currentTimeMillis();
-         System.out.println("v4.BandMatrix Aparapi  CG ready [" + String.format("%.5f", (float) (end - start) / i)
-               + "ms/itteration, " + (end - start) + "ms, itterations=" + i + ", execution mode="
-               + kernel.getExecutionMode().toString() + "]");
+         System.out.print("\t" + (end - start));
       }
-      
+
       if (Kernel.EXECUTION_MODE.GPU.equals(mode)) {
          Parameter.gpu_mode_succeded = kernel.getExecutionMode().equals(Kernel.EXECUTION_MODE.GPU);
       }
-      
+
       return x;
    }
 

@@ -38,13 +38,12 @@ public class TestRunner {
 
    public static void main(String[] args) {
 
+      System.out.println("#n\tv1\tv2\tv3a\tv3b\tv4a\tv4b\tv4c");
+
       for (int i = 0; i < 8; i++) {
 
-         System.out.println("NUMBER_OF_POCESSORS = " + Parameter.NUMBER_OF_POCESSORS);
-         System.out.println("BAND_WIDTH          = " + Parameter.BAND_WIDTH);
-         System.out.println("ROW_NUMBER          = " + Parameter.ROW_NUMBER);
-
-         System.out.println("");
+         System.out.print(Parameter.BAND_WIDTH*Parameter.ROW_NUMBER);
+       
          final Result result = JUnitCore.runClasses(v1.BandMatrixTest.class, v2.BandMatrixTest.class,
                v3.BandMatrixFullTest.class, v4.BandMatrixFullTest.class, v1.MatrixTest.class, v2.VectorTest.class,
                v4.VectorTest.class, v3.VectorTest.class);
@@ -55,9 +54,8 @@ public class TestRunner {
             }
          }
          System.out.println("");
-         System.out.println("**************************************************************************");
 
-         //       Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH - 1) << 1) + 1;
+         Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH - 1) << 1) + 1;
          Parameter.ROW_NUMBER = Parameter.ROW_NUMBER << 1;
          v2.BandMatrixTest.initNeeded = true;
 

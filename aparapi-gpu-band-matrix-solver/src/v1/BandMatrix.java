@@ -78,14 +78,14 @@ final public class BandMatrix {
    }
 
    public static Matrix solveConjugateGradient(final BandMatrix A, final Matrix b, boolean loggingEnabled) {
-      final double start = System.currentTimeMillis();
+      final long start = System.currentTimeMillis();
 
       Matrix x = new Matrix(b.rows, b.cols);
       Matrix r = b.minus(A.times(x));
       Matrix p = new Matrix(r);
       double rsold = r.transpose().times(r).getValue(0, 0);
-      int i = 1;
-      for (i = 1; i < MAX_NUMBER_OF_ITTERATIONS; i++) {
+
+      for (int i = 1; i < MAX_NUMBER_OF_ITTERATIONS; i++) {
          final Matrix Ap = A.times(p);
          final double alpha = rsold / p.transpose().times(Ap).getValue(0, 0);
          x = x.plus(p.multi(alpha));
@@ -101,9 +101,7 @@ final public class BandMatrix {
 
       if (loggingEnabled) {
          final long end = System.currentTimeMillis();
-         System.out.println("v1.BandMatrix Standard CG ready [" + String.format("%.5f", (float) (end - start) / i)
-               + "ms/itteration, " + +(end - start) + "ms, itterations=" + i + "]");
-
+         System.out.print("\t" + (end - start));
       }
       return x;
    }

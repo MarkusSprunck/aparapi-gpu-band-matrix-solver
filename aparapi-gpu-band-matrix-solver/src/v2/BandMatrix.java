@@ -116,8 +116,8 @@ final public class BandMatrix {
       Vector r = b.minus(A.times(x));
       Vector p = new Vector(r);
       double rsold = r.dotProduct(r);
-      int i = 1;
-      for (i = 1; i < MAX_NUMBER_OF_ITTERATIONS; i++) {
+
+      for (int i = 1; i < MAX_NUMBER_OF_ITTERATIONS; i++) {
          final Vector Ap = A.times(p);
          final double alpha = rsold / p.dotProduct(Ap);
          x = x.plus(p.multi(alpha));
@@ -133,8 +133,7 @@ final public class BandMatrix {
 
       if (loggingEnabled) {
          final long end = System.currentTimeMillis();
-         System.out.println("v2.BandMatrix Standard CG ready [" + String.format("%.5f", (float) (end - start) / i)
-               + "ms/itteration, " + +(end - start) + "ms, itterations=" + i + "]");
+         System.out.print("\t" + (end - start)  );
       }
 
       return x;
