@@ -109,8 +109,7 @@ final public class BandMatrix {
       values[getIndex(row, col - row)] = value;
    }
 
-   public static Vector solveConjugateGradient(final BandMatrix A, final Vector b, boolean loggingEnabled) {
-      final long start = System.currentTimeMillis();
+   public static Vector solveConjugateGradient(final BandMatrix A, final Vector b) {
 
       Vector x = new Vector(b.getMaxRows());
       Vector r = b.minus(A.times(x));
@@ -129,11 +128,6 @@ final public class BandMatrix {
          }
          p = r.plus(p.multi(beta));
          rsold = rsnew;
-      }
-
-      if (loggingEnabled) {
-         final long end = System.currentTimeMillis();
-         System.out.print("\t" + (end - start)  );
       }
 
       return x;

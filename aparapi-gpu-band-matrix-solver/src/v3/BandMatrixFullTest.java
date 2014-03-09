@@ -201,11 +201,12 @@ public class BandMatrixFullTest {
    public void v3_solveConjugateGradient_2_Aparapi_LargeRandomBandMatrix_Solved() {
 
       // ARRANGE
+      final long start = System.currentTimeMillis();
 
       // ACT
       //
       // solve linear equation
-      final Vector x = BandMatrixFull.solveConjugateGradientForkAndJoin(A, B, true);
+      final Vector x = BandMatrixFull.solveConjugateGradientForkAndJoin(A, B);
       //
       // all elements of result should be zero 
       final Vector temp = new Vector(B.getMaxRows());
@@ -215,6 +216,10 @@ public class BandMatrixFullTest {
 
       // CHECK
       Assert.assertArrayEquals(new double[Parameter.ROW_NUMBER], actual.getValues(), 1E-3);
+
+      final long end = System.currentTimeMillis();
+      System.out.print("\t" + (end - start));
+
    }
 
 }

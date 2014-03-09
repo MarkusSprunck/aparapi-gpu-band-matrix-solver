@@ -184,15 +184,12 @@ public final class BandMatrixFull {
 
       if (loggingEnabled) {
          final long end = System.currentTimeMillis();
-         System.out.print("\t" + (end - start)  );         
+         System.out.print("\t" + (end - start));
       }
       return x;
    }
 
-   public static Vector solveConjugateGradientForkAndJoin(BandMatrixFull A, Vector b, boolean loggingEnabled) {
-
-      // Measure start time for logging
-      final long start = System.currentTimeMillis();
+   public static Vector solveConjugateGradientForkAndJoin(BandMatrixFull A, Vector b) {
 
       // create local variables
       int i = -1;
@@ -240,10 +237,6 @@ public final class BandMatrixFull {
          rsold = rsnew;
       }
 
-      if (loggingEnabled) {
-         final long end = System.currentTimeMillis();
-         System.out.print("\t" + (end - start)  );
-      }
       return x;
    }
 

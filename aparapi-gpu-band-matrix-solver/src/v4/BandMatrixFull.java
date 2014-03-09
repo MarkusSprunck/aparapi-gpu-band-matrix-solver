@@ -190,8 +190,7 @@ final public class BandMatrixFull {
       return x;
    }
 
-   public static Vector solveConjugateGradientAparapi(BandMatrixFull A, Vector b, boolean loggingEnabled,
-         EXECUTION_MODE mode) {
+   public static Vector solveConjugateGradientAparapi(BandMatrixFull A, Vector b, EXECUTION_MODE mode) {
 
       // create local variables
       int i = 0;
@@ -224,9 +223,6 @@ final public class BandMatrixFull {
       kernel.setExecutionMode(mode);
       kernel.execute(range);
 
-      // Measure start time for logging (don't respect the setup time for Aparapi)
-      final long start = System.currentTimeMillis();
-
       while (i++ < MAX_NUMBER_OF_ITTERATIONS && rsnew > 1e-10) {
          // Ap = A * p
          kernel.putVectorB();
@@ -253,11 +249,6 @@ final public class BandMatrixFull {
 
          // rsold = rsnew
          rsold = rsnew;
-      }
-
-      if (loggingEnabled) {
-         final long end = System.currentTimeMillis();
-         System.out.print("\t" + (end - start));
       }
 
       if (Kernel.EXECUTION_MODE.GPU.equals(mode)) {

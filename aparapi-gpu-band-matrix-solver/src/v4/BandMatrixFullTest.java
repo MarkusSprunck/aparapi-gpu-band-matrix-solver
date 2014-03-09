@@ -259,11 +259,12 @@ public class BandMatrixFullTest {
       if (Parameter.gpu_mode_succeded) {
 
          // ARRANGE
+         final long start = System.currentTimeMillis();
 
          // ACT
          //
          // solve linear equation
-         final Vector x = BandMatrixFull.solveConjugateGradientAparapi(A, B, true, Kernel.EXECUTION_MODE.GPU);
+         final Vector x = BandMatrixFull.solveConjugateGradientAparapi(A, B, Kernel.EXECUTION_MODE.GPU);
          //
          // all elements of result should be zero 
          final Vector temp = new Vector(B.getMaxRows());
@@ -275,6 +276,9 @@ public class BandMatrixFullTest {
          for (int i = 0; i < Parameter.ROW_NUMBER; i++) {
             Assert.assertEquals(0.0d, actual.getValue(i), 1E-4);
          }
+
+         final long end = System.currentTimeMillis();
+         System.out.print("\t" + (end - start));
       }
    }
 
@@ -284,11 +288,12 @@ public class BandMatrixFullTest {
       if (Parameter.gpu_mode_succeded) {
 
          // ARRANGE
+         final long start = System.currentTimeMillis();
 
          // ACT
          //
          // solve linear equation
-         final Vector x = BandMatrixFull.solveConjugateGradientAparapi(A, B, true, Kernel.EXECUTION_MODE.JTP);
+         final Vector x = BandMatrixFull.solveConjugateGradientAparapi(A, B, Kernel.EXECUTION_MODE.JTP);
          //
          // all elements of result should be zero 
          final Vector temp = new Vector(B.getMaxRows());
@@ -300,6 +305,9 @@ public class BandMatrixFullTest {
          for (int i = 0; i < Parameter.ROW_NUMBER; i++) {
             Assert.assertEquals(0.0d, actual.getValue(i), 1E-4);
          }
+
+         final long end = System.currentTimeMillis();
+         System.out.print("\t" + (end - start));
       }
    }
 

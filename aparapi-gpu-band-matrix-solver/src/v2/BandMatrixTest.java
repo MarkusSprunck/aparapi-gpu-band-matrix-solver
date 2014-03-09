@@ -189,17 +189,21 @@ public class BandMatrixTest {
    public void v2_solveConjugateGradient_LargeRandomBandMatrix_Solved() {
 
       // ARRANGE
+      final long start = System.currentTimeMillis();
 
       // ACT
       //
       // solve linear equation
-      final Vector x = BandMatrix.solveConjugateGradient(A, B, true);
+      final Vector x = BandMatrix.solveConjugateGradient(A, B);
       //
       // all elements of result should be zero 
       final Vector result = A.times(x).minus(B);
 
       // CHECK
       Assert.assertArrayEquals(new double[Parameter.ROW_NUMBER], result.getValues(), 1E-3);
+
+      final long end = System.currentTimeMillis();
+      System.out.print("\t" + (end - start));
    }
 
    @Test
@@ -257,7 +261,7 @@ public class BandMatrixTest {
       // ACT
       //
       // solve linear equation
-      final Vector x = BandMatrix.solveConjugateGradient(A, b, false);
+      final Vector x = BandMatrix.solveConjugateGradient(A, b);
       //
       // all elements of result should be zero 
       final Vector result = A.times(x).minus(b);

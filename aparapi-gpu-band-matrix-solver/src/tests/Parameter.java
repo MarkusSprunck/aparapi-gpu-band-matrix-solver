@@ -35,10 +35,10 @@ public class Parameter {
 
    public static int NUMBER_OF_POCESSORS = Runtime.getRuntime().availableProcessors();
 
-   public static int BAND_WIDTH = 4 + 1;
+   public static int BAND_WIDTH = 24 + 1;
 
-   public static int ROW_NUMBER = 32;
-   
+   public static int ROW_NUMBER = 128;
+
    public static boolean gpu_mode_succeded = true;
 
 }

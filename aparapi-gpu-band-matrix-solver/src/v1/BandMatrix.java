@@ -77,8 +77,7 @@ final public class BandMatrix {
       }
    }
 
-   public static Matrix solveConjugateGradient(final BandMatrix A, final Matrix b, boolean loggingEnabled) {
-      final long start = System.currentTimeMillis();
+   public static Matrix solveConjugateGradient(final BandMatrix A, final Matrix b) {
 
       Matrix x = new Matrix(b.rows, b.cols);
       Matrix r = b.minus(A.times(x));
@@ -99,10 +98,6 @@ final public class BandMatrix {
          rsold = rsnew;
       }
 
-      if (loggingEnabled) {
-         final long end = System.currentTimeMillis();
-         System.out.print("\t" + (end - start));
-      }
       return x;
    }
 
