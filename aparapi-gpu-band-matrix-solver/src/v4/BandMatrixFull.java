@@ -78,6 +78,9 @@ final public class BandMatrixFull {
    public Vector times(final Vector b, Vector result) {
 
       // prepare input parameter
+      int index = 0;
+      long sum = 0;
+      int rowOffset = 0;
       final int rowStart = 0;
       final int rowEnd = rows;
       final int colMaximum = cols;
@@ -86,14 +89,13 @@ final public class BandMatrixFull {
 
       // execute band matrix multiplication
       for (int row = rowStart; row < rowEnd; row++) {
-         final int rowOffset = row * colMaximum;
-         long sum = PackedDouble.pack(0.0);
+         rowOffset = row * colMaximum;
+         sum = PackedDouble.pack(0.0);
          for (int col = 0; col < colMaximum; col++) {
-            final int index = row - bandwidthMid + col;
+            index = row - bandwidthMid + col;
             if (index < rowMaximum && index >= 0) {
-               final long second = b.packedValues[index];
-               final long temp = PackedDouble.multiplyPacked(packedValues[col + rowOffset], second);
-               sum = PackedDouble.addPacked(sum, temp);
+               sum = PackedDouble.addPacked(sum,
+                     PackedDouble.multiplyPacked(packedValues[col + rowOffset], b.packedValues[index]));
             }
          }
          result.packedValues[row] = sum;
@@ -135,11 +137,8 @@ final public class BandMatrixFull {
    }
 
    public static Vector solveConjugateGradientStandard(BandMatrixFull A, Vector b, boolean loggingEnabled) {
-      // Measure start time for logging
-      final long start = System.currentTimeMillis();
 
       // create local variables
-      int i = 0;
       double rsnew = 1.0;
       final int numberOfEquations = b.getMaxRows();
       final Vector Ap = new Vector(numberOfEquations);
@@ -157,7 +156,7 @@ final public class BandMatrixFull {
       // rsold = r' * r
       double rsold = r.dotProduct(r);
 
-      while (i++ < MAX_NUMBER_OF_ITTERATIONS && rsnew > 1e-10) {
+      for (int i = 1; i < MAX_NUMBER_OF_ITTERATIONS; i++) {
          // Ap = A * p
          A.times(p, Ap);
 
@@ -174,6 +173,9 @@ final public class BandMatrixFull {
 
          // rsnew = r' * r
          rsnew = r.dotProduct(r);
+         if (rsnew < 1e-10) {
+            break;
+         }
 
          // p = r + rsnew / rsold * p
          p.multi(rsnew / rsold, temp);
@@ -183,10 +185,6 @@ final public class BandMatrixFull {
          rsold = rsnew;
       }
 
-      if (loggingEnabled) {
-         final long end = System.currentTimeMillis();
-         System.out.print("\t" + (end - start));
-      }
       return x;
    }
 

@@ -71,11 +71,11 @@ public class BandMatrixMultiplicatonAparapi extends Kernel {
 
       // prepare input parameter
       final int row = getGlobalId();
+      final int rowOffset = row * colMaximum[0];
 
       // execute band matrix multiplication (for one row)
-      long sum = -MIN_EXP * SPLIT_EXP;
+      long sum = 0L;
       int index = 0;
-      final int rowOffset = row * colMaximum[0];
       for (int col = 0; col < colMaximum[0]; col++) {
          index = row - bandwidthMid[0] + col;
          if (index < rowMaximum[0] && index >= 0) {

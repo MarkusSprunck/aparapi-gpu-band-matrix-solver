@@ -50,7 +50,8 @@ public class Vector {
    // return C = A + B
    public Vector plus(final Vector B, final Vector result) {
       for (int i = 0; i < packedValues.length; i++) {
-         result.packedValues[i] = PackedDouble.addPacked(packedValues[i], B.packedValues[i]);
+         result.packedValues[i] = PackedDouble.pack(PackedDouble.unpack(packedValues[i])
+               + PackedDouble.unpack(B.packedValues[i]));
       }
       return result;
    }
@@ -68,7 +69,7 @@ public class Vector {
    public double dotProduct(final Vector B) {
       double result = 0.0;
       for (int i = 0; i < packedValues.length; i++) {
-         result += PackedDouble.unpack(PackedDouble.multiplyPacked(packedValues[i], B.packedValues[i]));
+         result += PackedDouble.unpack(packedValues[i]) * PackedDouble.unpack( B.packedValues[i]);
       }
       return result;
    }
@@ -95,7 +96,7 @@ public class Vector {
 
    @Override
    public String toString() {
-      final StringBuilder sb = new StringBuilder("v5.Vector [");
+      final StringBuilder sb = new StringBuilder("v4.Vector [");
       for (int i = 0; i < packedValues.length; i++) {
          sb.append(String.format("%.6E", PackedDouble.unpack(packedValues[i]))).append("  ");
       }
