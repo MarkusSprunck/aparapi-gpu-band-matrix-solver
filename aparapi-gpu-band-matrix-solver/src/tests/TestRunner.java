@@ -66,7 +66,7 @@ public class TestRunner {
          }
          System.out.println("");
 
-         Parameter.ROW_NUMBER += 64;
+         Parameter.ROW_NUMBER += 128;
          Parameter.BAND_WIDTH = Parameter.ROW_NUMBER / 10;
          Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH % 2) == 0) ? Parameter.BAND_WIDTH + 1 : Parameter.BAND_WIDTH;
       }
@@ -89,6 +89,6 @@ public class TestRunner {
    }
 
    private static double createRandomNumber() {
-      return 10 * Math.random();
+      return 10 * (Math.random() - 0.5);
    }
 }
