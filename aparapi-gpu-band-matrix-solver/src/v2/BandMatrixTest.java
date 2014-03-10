@@ -45,29 +45,19 @@ public class BandMatrixTest {
 
    public static Vector B;
 
-   public static boolean initNeeded = true;
-
-   private static final Object HANDLER_INIT_LOCK = new Object();
-
    @BeforeClass
    public static void v2_setup() {
-      synchronized (HANDLER_INIT_LOCK) {
-         if (initNeeded) {
-            A = new BandMatrix(Parameter.ROW_NUMBER, Parameter.BAND_WIDTH);
-            B = new Vector(Parameter.ROW_NUMBER);
-            for (int row = 0; row < Parameter.ROW_NUMBER; row++) {
-               for (int col = 0; col <= (Parameter.BAND_WIDTH >> 1); col++) {
-                  A.setValue(row, row + col, createRandomNumber());
-               }
-               B.setValue(row, createRandomNumber());
-            }
-            initNeeded = false;
-         }
-      }
-   }
 
-   private static double createRandomNumber() {
-      return 2.0 * (Math.random() - 0.5) * Math.pow(10, 4 * (Math.random() - 0.2));
+      tests.TestRunner.setupTestData();
+
+      A = new BandMatrix(Parameter.ROW_NUMBER, Parameter.BAND_WIDTH);
+      B = new Vector(Parameter.ROW_NUMBER);
+      for (int row = 0; row < Parameter.ROW_NUMBER; row++) {
+         for (int col = 0; col <= (Parameter.BAND_WIDTH >> 1); col++) {
+            A.setValue(row, row + col, tests.TestRunner.A.getValue(row, row + col));
+         }
+         B.setValue(row, tests.TestRunner.B.getValue(row));
+      }
    }
 
    @Test

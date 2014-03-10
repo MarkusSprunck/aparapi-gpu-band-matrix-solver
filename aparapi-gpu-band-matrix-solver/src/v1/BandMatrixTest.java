@@ -47,16 +47,17 @@ public class BandMatrixTest {
 
    @BeforeClass
    public static void v1_setup() {
-      v2.BandMatrixTest.v2_setup();
+
+      tests.TestRunner.setupTestData();
+
       A = new v1.BandMatrix(Parameter.ROW_NUMBER, Parameter.BAND_WIDTH);
       B = new v1.Matrix(Parameter.ROW_NUMBER, 1);
       for (int row = 0; row < Parameter.ROW_NUMBER; row++) {
          for (int col = row; col < row + Parameter.BAND_WIDTH && col < Parameter.ROW_NUMBER; col++) {
-            A.setValue(row, col, v2.BandMatrixTest.A.getValue(row, col));
+            A.setValue(row, col, tests.TestRunner.A.getValue(row, col));
          }
-         B.setValue(row, 0, v2.BandMatrixTest.B.getValue(row));
+         B.setValue(row, 0, tests.TestRunner.B.getValue(row));
       }
-
    }
 
    @Test

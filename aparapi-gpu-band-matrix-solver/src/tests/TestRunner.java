@@ -34,20 +34,30 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
+import v2.BandMatrix;
+import v2.Vector;
+
 public class TestRunner {
+
+   public static boolean initNeeded = true;
+
+   private static final Object HANDLER_INIT_LOCK = new Object();
+
+   public static BandMatrix A;
+
+   public static Vector B;
 
    public static void main(String[] args) {
 
-      System.out.println("#rows\t#cols\tv1\tv2\tv3a\tv3b\tv4a\tv4b\tv4c");
+      System.out.println("#rows\t#cols\tv1\tv3a\tv3b\tv4a\tv4b\tv4c");
 
-      for (int i = 0; i <= 2048; i++) {
+      while (Parameter.ROW_NUMBER < Parameter.ROW_NUMBER_MAX && Parameter.BAND_WIDTH < Parameter.BAND_WIDTH_MAX) {
 
          System.out.print(Parameter.ROW_NUMBER + "\t");
          System.out.print(Parameter.BAND_WIDTH);
 
-         final Result result = JUnitCore.runClasses(v1.BandMatrixTest.class, v2.BandMatrixTest.class,
-               v3.BandMatrixFullTest.class, v4.BandMatrixFullTest.class, v1.MatrixTest.class, v2.VectorTest.class,
-               v4.VectorTest.class, v3.VectorTest.class);
+         final Result result = JUnitCore.runClasses(v1.BandMatrixTest.class, /* v2.BandMatrixTest.class, */
+               v3.BandMatrixFullTest.class, v4.BandMatrixFullTest.class);
 
          if (!result.getFailures().isEmpty()) {
             for (final Failure failure : result.getFailures()) {
@@ -56,8 +66,29 @@ public class TestRunner {
          }
          System.out.println("");
 
-         Parameter.ROW_NUMBER += 128;
-         v2.BandMatrixTest.initNeeded = true;
+         Parameter.ROW_NUMBER += 64;
+         Parameter.BAND_WIDTH = Parameter.ROW_NUMBER / 10;
+         Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH % 2) == 0) ? Parameter.BAND_WIDTH + 1 : Parameter.BAND_WIDTH;
       }
+   }
+
+   public static void setupTestData() {
+      synchronized (HANDLER_INIT_LOCK) {
+         if (initNeeded) {
+            A = new v2.BandMatrix(Parameter.ROW_NUMBER_MAX, Parameter.BAND_WIDTH_MAX);
+            B = new v2.Vector(Parameter.ROW_NUMBER_MAX);
+            for (int row = 0; row < Parameter.ROW_NUMBER_MAX; row++) {
+               for (int col = 0; col <= (Parameter.BAND_WIDTH_MAX >> 1); col++) {
+                  A.setValue(row, row + col, createRandomNumber());
+               }
+               B.setValue(row, createRandomNumber());
+            }
+            initNeeded = false;
+         }
+      }
+   }
+
+   private static double createRandomNumber() {
+      return 10 * Math.random();
    }
 }
