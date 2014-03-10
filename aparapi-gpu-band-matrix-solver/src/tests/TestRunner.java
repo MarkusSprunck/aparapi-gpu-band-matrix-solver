@@ -49,7 +49,7 @@ public class TestRunner {
 
    public static void main(String[] args) {
 
-      System.out.println("#rows\t#cols\tv1\tv3a\tv3b\tv4a\tv4b\tv4c");
+      System.out.println("#rows\t#cols\tv1\tv3a\tv3b\tv4");
 
       while (Parameter.ROW_NUMBER < Parameter.ROW_NUMBER_MAX && Parameter.BAND_WIDTH < Parameter.BAND_WIDTH_MAX) {
 
@@ -66,7 +66,7 @@ public class TestRunner {
          }
          System.out.println("");
 
-         Parameter.ROW_NUMBER += 128;
+         Parameter.ROW_NUMBER += 256;
          Parameter.BAND_WIDTH = Parameter.ROW_NUMBER / 10;
          Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH % 2) == 0) ? Parameter.BAND_WIDTH + 1 : Parameter.BAND_WIDTH;
       }

@@ -193,7 +193,7 @@ final public class BandMatrixFull {
    public static Vector solveConjugateGradientAparapi(BandMatrixFull A, Vector b, EXECUTION_MODE mode) {
 
       // create local variables
-      int i = 0;
+      double alpha = 0.0;
       double rsnew = 1.0;
       final int numberOfEquations = b.getMaxRows();
       final Vector Ap = new Vector(numberOfEquations);
@@ -223,14 +223,14 @@ final public class BandMatrixFull {
       kernel.setExecutionMode(mode);
       kernel.execute(range);
 
-      while (i++ < MAX_NUMBER_OF_ITTERATIONS && rsnew > 1e-10) {
+      for (int i = 1; i < MAX_NUMBER_OF_ITTERATIONS; i++) {
          // Ap = A * p
          kernel.putVectorB();
          kernel.execute(range);
          kernel.getVectorX();
 
          // alpha = rsold / ( p' * Ap )
-         final double alpha = rsold / p.dotProduct(Ap);
+         alpha = rsold / p.dotProduct(Ap);
 
          // x = x + alpha * p
          p.multi(alpha, temp);
@@ -242,6 +242,9 @@ final public class BandMatrixFull {
 
          // rsnew = r' * r
          rsnew = r.dotProduct(r);
+         if (rsnew < 1e-10) {
+            break;
+         }
 
          // p = r + rsnew / rsold * p
          p.multi(rsnew / rsold, temp);
@@ -268,7 +271,7 @@ final public class BandMatrixFull {
 
    @Override
    public String toString() {
-      final StringBuilder sb = new StringBuilder("v1.Matrix[");
+      final StringBuilder sb = new StringBuilder("v4.Matrix[");
       sb.append(NL);
       for (int row = 0; row < rows; row++) {
          sb.append('[');

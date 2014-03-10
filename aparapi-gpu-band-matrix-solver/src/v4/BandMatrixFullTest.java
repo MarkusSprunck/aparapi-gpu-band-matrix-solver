@@ -230,29 +230,29 @@ public class BandMatrixFullTest {
       Assert.assertEquals(465.0f, x.getValue(6), 0.0000000000001f);
    }
 
-   @Test
-   public void v4_solveConjugateGradient_1_Standard_LargeRandomBandMatrix_Solved() {
-
-      if (Parameter.gpu_mode_succeded) {
-         // ARRANGE
-
-         // ACT
-         //
-         // solve linear equation
-         final Vector x = BandMatrixFull.solveConjugateGradientStandard(A, B, true);
-         //
-         // all elements of result should be zero 
-         final Vector temp = new Vector(B.getMaxRows());
-         A.times(x, temp);
-         final Vector actual = new Vector(B.getMaxRows());
-         temp.minus(B, actual);
-
-         // CHECK
-         for (int i = 0; i < Parameter.ROW_NUMBER; i++) {
-            Assert.assertEquals(0.0d, actual.getValue(i), 1E-4);
-         }
-      }
-   }
+//   @Test
+//   public void v4_solveConjugateGradient_1_Standard_LargeRandomBandMatrix_Solved() {
+//
+//      if (Parameter.gpu_mode_succeded) {
+//         // ARRANGE
+//
+//         // ACT
+//         //
+//         // solve linear equation
+//         final Vector x = BandMatrixFull.solveConjugateGradientStandard(A, B, true);
+//         //
+//         // all elements of result should be zero 
+//         final Vector temp = new Vector(B.getMaxRows());
+//         A.times(x, temp);
+//         final Vector actual = new Vector(B.getMaxRows());
+//         temp.minus(B, actual);
+//
+//         // CHECK
+//         for (int i = 0; i < Parameter.ROW_NUMBER; i++) {
+//            Assert.assertEquals(0.0d, actual.getValue(i), 1E-4);
+//         }
+//      }
+//   }
 
    @Test
    public void v4_solveConjugateGradient_2_Aparapi_GPU_LargeRandomBandMatrix_Solved() {
@@ -283,33 +283,33 @@ public class BandMatrixFullTest {
       }
    }
 
-   @Test
-   public void v4_solveConjugateGradient_3_Aparapi_JTP_LargeRandomBandMatrix_Solved() {
-
-      if (Parameter.gpu_mode_succeded) {
-
-         // ARRANGE
-         final long start = System.currentTimeMillis();
-
-         // ACT
-         //
-         // solve linear equation
-         final Vector x = BandMatrixFull.solveConjugateGradientAparapi(A, B, Kernel.EXECUTION_MODE.JTP);
-         //
-         // all elements of result should be zero 
-         final Vector temp = new Vector(B.getMaxRows());
-         A.times(x, temp);
-         final Vector actual = new Vector(B.getMaxRows());
-         temp.minus(B, actual);
-
-         // CHECK
-         for (int i = 0; i < Parameter.ROW_NUMBER; i++) {
-            Assert.assertEquals(0.0d, actual.getValue(i), 1E-4);
-         }
-
-         final long end = System.currentTimeMillis();
-         System.out.print("\t" + (end - start));
-      }
-   }
+//   @Test
+//   public void v4_solveConjugateGradient_3_Aparapi_JTP_LargeRandomBandMatrix_Solved() {
+//
+//      if (Parameter.gpu_mode_succeded) {
+//
+//         // ARRANGE
+//         final long start = System.currentTimeMillis();
+//
+//         // ACT
+//         //
+//         // solve linear equation
+//         final Vector x = BandMatrixFull.solveConjugateGradientAparapi(A, B, Kernel.EXECUTION_MODE.JTP);
+//         //
+//         // all elements of result should be zero 
+//         final Vector temp = new Vector(B.getMaxRows());
+//         A.times(x, temp);
+//         final Vector actual = new Vector(B.getMaxRows());
+//         temp.minus(B, actual);
+//
+//         // CHECK
+//         for (int i = 0; i < Parameter.ROW_NUMBER; i++) {
+//            Assert.assertEquals(0.0d, actual.getValue(i), 1E-4);
+//         }
+//
+//         final long end = System.currentTimeMillis();
+//         System.out.print("\t" + (end - start));
+//      }
+//   }
 
 }

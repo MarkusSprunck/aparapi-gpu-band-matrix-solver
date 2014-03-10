@@ -133,13 +133,12 @@ public final class BandMatrixFull {
       }
    }
 
-   public static Vector solveConjugateGradient(final BandMatrixFull A, final Vector b, boolean loggingEnabled) {
-      // Measure start time for logging
-      final long start = System.currentTimeMillis();
+   public static Vector solveConjugateGradient(final BandMatrixFull A, final Vector b) {
 
       // create local variables
       int i = -1;
       double rsnew = 1.0;
+      double alpha = 0.0;
       final int numberOfEquations = b.getMaxRows();
       final Vector Ap = new Vector(numberOfEquations);
       final Vector x = new Vector(numberOfEquations);
@@ -161,7 +160,7 @@ public final class BandMatrixFull {
          A.times(p, Ap);
 
          // alpha = rsold / ( p' * Ap )
-         final double alpha = rsold / p.dotProduct(Ap);
+         alpha = rsold / p.dotProduct(Ap);
 
          // x = x + alpha * p
          p.multi(alpha, temp);
@@ -182,18 +181,14 @@ public final class BandMatrixFull {
          rsold = rsnew;
       }
 
-      if (loggingEnabled) {
-         final long end = System.currentTimeMillis();
-         System.out.print("\t" + (end - start));
-      }
       return x;
    }
 
    public static Vector solveConjugateGradientForkAndJoin(BandMatrixFull A, Vector b) {
 
       // create local variables
-      int i = -1;
       double rsnew = 1.0;
+      double alpha = 0.0;
       final int numberOfEquations = b.getMaxRows();
       final Vector Ap = new Vector(numberOfEquations);
       final Vector x = new Vector(numberOfEquations);
@@ -210,13 +205,12 @@ public final class BandMatrixFull {
       // rsold = r' * r
       double rsold = r.dotProduct(r);
 
-      while (i++ < MAX_NUMBER_OF_ITTERATIONS && rsnew > 1e-10) {
+      for (int i = 1; i < MAX_NUMBER_OF_ITTERATIONS; i++) {
          // Ap = A * p
-         final v3.BandMatrixMultiplicatonTask task = new v3.BandMatrixMultiplicatonTask(0, A.getMaxRows(), A, p, Ap);
-         POOL.invoke(task);
+         POOL.invoke(new v3.BandMatrixMultiplicatonTask(0, A.getMaxRows(), A, p, Ap));
 
          // alpha = rsold / ( p' * Ap )
-         final double alpha = rsold / p.dotProduct(Ap);
+         alpha = rsold / p.dotProduct(Ap);
 
          // x = x + alpha * p
          p.multi(alpha, temp);
@@ -228,6 +222,9 @@ public final class BandMatrixFull {
 
          // rsnew = r' * r
          rsnew = r.dotProduct(r);
+         if (rsnew < 1e-10) {
+            break;
+         }
 
          // p = r + rsnew / rsold * p
          p.multi(rsnew / rsold, temp);
