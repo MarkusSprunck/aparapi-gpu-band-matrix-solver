@@ -8,5 +8,7 @@ ECHO  === Store Information about GPU
 clinfo.exe > run_x86_64_clinfo.txt 
 
 ECHO  === Run all tests start 
-.\jre7_64\bin\java -Dcom.amd.aparapi.enableProfiling=true -classpath aparapi.jar;aparapi-gpu-band-matrix-solver.jar tests.TestRunner 	
+.\jre7_64\bin\java -Dcom.amd.aparapi.enableProfiling=true -classpath aparapi.jar;aparapi-gpu-band-matrix-solver.jar tests.TestRunner 
+
+PAUSE	
 
