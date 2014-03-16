@@ -35,13 +35,11 @@ public class Parameter {
 
    public static final int ROW_NUMBER_MAX = 8 * 1024;
 
-   public static final int BAND_WIDTH_MAX = 128;
-
    public static int NUMBER_OF_POCESSORS = Runtime.getRuntime().availableProcessors();
 
-   public static int BAND_WIDTH = 51;
+   public static int BAND_WIDTH = 101;
 
-   public static int ROW_NUMBER = 512;
+   public static int ROW_NUMBER = 128;
 
    public static boolean gpu_mode_succeded = true;
 

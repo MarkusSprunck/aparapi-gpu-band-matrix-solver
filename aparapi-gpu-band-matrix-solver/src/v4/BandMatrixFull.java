@@ -94,8 +94,7 @@ final public class BandMatrixFull {
          for (int col = 0; col < colMaximum; col++) {
             index = row - bandwidthMid + col;
             if (index < rowMaximum && index >= 0) {
-               sum = PackedDouble.addPacked(sum,
-                     PackedDouble.multiplyPacked(packedValues[col + rowOffset], b.packedValues[index]));
+               sum = PackedDouble.addPacked(sum, PackedDouble.multiplyPacked(packedValues[col + rowOffset], b.packedValues[index]));
             }
          }
          result.packedValues[row] = sum;
@@ -136,10 +135,11 @@ final public class BandMatrixFull {
       }
    }
 
-   public static Vector solveConjugateGradientStandard(BandMatrixFull A, Vector b, boolean loggingEnabled) {
+   public static Vector solveConjugateGradientStandard(BandMatrixFull A, Vector b) {
 
       // create local variables
       double rsnew = 1.0;
+      double alpha = 0.0;
       final int numberOfEquations = b.getMaxRows();
       final Vector Ap = new Vector(numberOfEquations);
       final Vector x = new Vector(numberOfEquations);
@@ -161,7 +161,7 @@ final public class BandMatrixFull {
          A.times(p, Ap);
 
          // alpha = rsold / ( p' * Ap )
-         final double alpha = rsold / p.dotProduct(Ap);
+         alpha = rsold / p.dotProduct(Ap);
 
          // x = x + alpha * p
          p.multi(alpha, temp);
