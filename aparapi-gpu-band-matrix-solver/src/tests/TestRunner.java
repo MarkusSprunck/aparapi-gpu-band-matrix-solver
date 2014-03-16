@@ -51,13 +51,13 @@ public class TestRunner {
 
       System.out.println("#rows\t#cols\tv3a\tv3b\tv4");
 
-      while (Parameter.ROW_NUMBER < Parameter.ROW_NUMBER_MAX && Parameter.BAND_WIDTH < Parameter.BAND_WIDTH_MAX) {
+      while (Parameter.ROW_NUMBER < Parameter.ROW_NUMBER_MAX) {
 
          System.out.print(Parameter.ROW_NUMBER + "\t");
          System.out.print(Parameter.BAND_WIDTH);
 
          final Result result = JUnitCore.runClasses(/* v1.BandMatrixTest.class, v2.BandMatrixTest.class, */
-               v3.BandMatrixFullTest.class, v4.BandMatrixFullTest.class);
+         v3.BandMatrixFullTest.class, v4.BandMatrixFullTest.class);
 
          if (!result.getFailures().isEmpty()) {
             for (final Failure failure : result.getFailures()) {
@@ -68,7 +68,8 @@ public class TestRunner {
 
          Parameter.ROW_NUMBER += 512;
          Parameter.BAND_WIDTH = Parameter.ROW_NUMBER / 10;
-         Parameter.BAND_WIDTH = ((Parameter.BAND_WIDTH % 2) == 0) ? Parameter.BAND_WIDTH + 1 : Parameter.BAND_WIDTH;
+         Parameter.BAND_WIDTH = Math.min(Parameter.BAND_WIDTH_MAX, ((Parameter.BAND_WIDTH % 2) == 0) ? Parameter.BAND_WIDTH + 1
+               : Parameter.BAND_WIDTH);
       }
    }
 

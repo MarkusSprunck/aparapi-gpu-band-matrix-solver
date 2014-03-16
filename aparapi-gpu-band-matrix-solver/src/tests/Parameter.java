@@ -33,9 +33,9 @@ package tests;
 
 public class Parameter {
 
-   public static final int ROW_NUMBER_MAX = 4 * 1024;
+   public static final int ROW_NUMBER_MAX = 8 * 1024;
 
-   public static final int BAND_WIDTH_MAX = 1024;
+   public static final int BAND_WIDTH_MAX = 128;
 
    public static int NUMBER_OF_POCESSORS = Runtime.getRuntime().availableProcessors();
 
