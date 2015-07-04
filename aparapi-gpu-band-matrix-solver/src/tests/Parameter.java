@@ -33,7 +33,7 @@ package tests;
 
 public class Parameter {
 
-   public static final int ROW_NUMBER_MAX = 8 * 1024;
+   public static final int ROW_NUMBER_MAX = 1025;
 
    public static int NUMBER_OF_POCESSORS = Runtime.getRuntime().availableProcessors();
 
@@ -41,6 +41,6 @@ public class Parameter {
 
    public static int ROW_NUMBER = 128;
 
-   public static boolean gpu_mode_succeded = true;
+   public static boolean gpu_mode_succeeded = true;
 
 }

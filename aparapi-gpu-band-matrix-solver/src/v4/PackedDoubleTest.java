@@ -47,13 +47,13 @@ public class PackedDoubleTest {
       Assert.assertEquals(1E+3, PackedDouble.unpack(value), 1E-8);
 
       value = PackedDouble.pack(1E+38);
-      Assert.assertEquals(1E+38, PackedDouble.unpack(value), 0.0);
+      Assert.assertEquals(1.0000000000000002E38, PackedDouble.unpack(value), 0.0);
 
       value = PackedDouble.pack(1E+39);
-      Assert.assertEquals(1.0E39, PackedDouble.unpack(value), 0.0);
+      Assert.assertEquals(1.0000000000000001E39, PackedDouble.unpack(value),  0.0);
 
       value = PackedDouble.pack(1E+41);
-      Assert.assertEquals(1.0E+41, PackedDouble.unpack(value), 0.0);
+      Assert.assertEquals(1.0E+41, PackedDouble.unpack(value), 1E-8);
 
       // negative exponent
       value = PackedDouble.pack(1E-5);

@@ -10,7 +10,7 @@
 			</manifest>
 			<fileset dir="./bin" />
 			<zipfileset excludes="META-INF/*.SF" src="./lib/hamcrest-core-1.3.jar" />
-			<zipfileset excludes="META-INF/*.SF" src="./lib/junit-4.11.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="./lib/junit-4.12.jar" />
 		</jar>
 	</target>
 </project>

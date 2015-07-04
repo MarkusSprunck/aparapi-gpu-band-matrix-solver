@@ -253,7 +253,7 @@ final public class BandMatrixFull {
       }
 
       if (Kernel.EXECUTION_MODE.GPU.equals(mode)) {
-         Parameter.gpu_mode_succeded = kernel.getExecutionMode().equals(Kernel.EXECUTION_MODE.GPU);
+         Parameter.gpu_mode_succeeded = kernel.getExecutionMode().equals(Kernel.EXECUTION_MODE.GPU);
       }
 
       return x;

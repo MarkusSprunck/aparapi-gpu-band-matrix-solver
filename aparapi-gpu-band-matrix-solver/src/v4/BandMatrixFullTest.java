@@ -233,7 +233,7 @@ public class BandMatrixFullTest {
    @Test
    public void v4_solveConjugateGradient_1_Standard_LargeRandomBandMatrix_Solved() {
 
-      if (Parameter.gpu_mode_succeded) {
+      if (Parameter.gpu_mode_succeeded) {
 
          // ARRANGE
          final long start = System.currentTimeMillis();
@@ -264,7 +264,7 @@ public class BandMatrixFullTest {
    @Test
    public void v4_solveConjugateGradient_2_Aparapi_GPU_LargeRandomBandMatrix_Solved() {
 
-      if (Parameter.gpu_mode_succeded) {
+      if (Parameter.gpu_mode_succeeded) {
 
          // ARRANGE
          final long start = System.currentTimeMillis();
@@ -295,7 +295,7 @@ public class BandMatrixFullTest {
    @Test
    public void v4_solveConjugateGradient_3_Aparapi_JTP_LargeRandomBandMatrix_Solved() {
 
-      if (Parameter.gpu_mode_succeded) {
+      if (Parameter.gpu_mode_succeeded) {
 
          // ARRANGE
          final long start = System.currentTimeMillis();

@@ -129,13 +129,12 @@ final public class Matrix {
       return rows;
    }
 
-   @Override
    public String toString() {
       final StringBuilder sb = new StringBuilder("v1.Matrix[");
       for (int i = 0; i < values.length; i++) {
          sb.append('[');
          for (int k = 0; k < values[i].length; k++) {
-            sb.append(String.format("%.6E", values[i][k]));
+            sb.append(String.format("%.6E",values[i][k]));
             if (values[i].length > 1) {
                sb.append(' ');
             }

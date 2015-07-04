@@ -30,6 +30,10 @@
  */
 package tests;
 
+import java.util.List;
+
+import org.junit.experimental.ParallelComputer;
+import org.junit.runner.Computer;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -56,11 +60,13 @@ public class TestRunner {
          System.out.print(Parameter.ROW_NUMBER + "\t");
          System.out.print(Parameter.BAND_WIDTH);
 
-         final Result result = JUnitCore.runClasses(v1.BandMatrixTest.class, v2.BandMatrixTest.class, v3.BandMatrixFullTest.class,
-               v4.BandMatrixFullTest.class);
+         Class []  clazzes = new Class[] { v1.BandMatrixTest.class, v2.BandMatrixTest.class, v3.BandMatrixFullTest.class,
+               v4.BandMatrixFullTest.class};
+         final Result result = JUnitCore.runClasses(clazzes);
 
-         if (!result.getFailures().isEmpty()) {
-            for (final Failure failure : result.getFailures()) {
+         List<Failure> failures = result.getFailures();
+         if (!failures.isEmpty()) {
+            for (Object failure : failures) {
                System.out.println(failure.toString());
             }
          }
